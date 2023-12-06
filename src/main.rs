@@ -34,6 +34,18 @@ struct Board<'a> {
 }
 
 impl<'a> Board<'a> {
+    fn new(
+        r1_perm: Row<'a>,
+        r2_perm: Row<'a>,
+        r3_perm: Row<'a>,
+        r4_perm: Row<'a>,
+        r5_perm: Row<'a>,
+    ) -> Self {
+        Self {
+            rows: vec![r1_perm, r2_perm, r3_perm, r4_perm, r5_perm],
+        }
+    }
+
     fn is_valid(&self) -> bool {
         if !self.is_line_valid(DIAGONAL_LINE_DOWN_LEFT_INDEXES) {
             return false;
@@ -55,18 +67,6 @@ impl<'a> Board<'a> {
             }
         }
         true
-    }
-
-    fn new(
-        r1_perm: Row<'a>,
-        r2_perm: Row<'a>,
-        r3_perm: Row<'a>,
-        r4_perm: Row<'a>,
-        r5_perm: Row<'a>,
-    ) -> Self {
-        Self {
-            rows: vec![r1_perm, r2_perm, r3_perm, r4_perm, r5_perm],
-        }
     }
 }
 
