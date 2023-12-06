@@ -11,9 +11,9 @@ Hexagons: 6 edges and 6 vertices
 """
 
 from itertools import combinations, permutations
-from typing import Generator, List, Tuple
+from typing import Generator, List, Set, Tuple
 
-DIAGONAL_LINE_DOWN_LEFT_INDEXES = [
+DIAGONAL_LINE_DOWN_LEFT_INDEXES: List[Tuple[Tuple[int, int], ...]] = [
     ((0, 0), (1, 0), (2, 0)),
     ((0, 1), (1, 1), (2, 1), (3, 0)),
     ((0, 2), (1, 2), (2, 2), (3, 1), (4, 0)),
@@ -21,7 +21,7 @@ DIAGONAL_LINE_DOWN_LEFT_INDEXES = [
     ((2, 4), (3, 3), (4, 2)),
 ]
 
-DIAGONAL_LINE_DOWN_RIGHT_INDEXES = [
+DIAGONAL_LINE_DOWN_RIGHT_INDEXES: List[Tuple[Tuple[int, int], ...]] = [
     ((2, 0), (3, 0), (4, 0)),
     ((1, 0), (2, 1), (3, 1), (4, 1)),
     ((0, 0), (1, 1), (2, 2), (3, 2), (4, 2)),
@@ -45,9 +45,12 @@ Board = Tuple[
     Tuple[int, ...],
 ]
 
+# Pieces range from 1 to 19
+PIECES = range(1, 20)
+
 
 def is_diagonal_valid(
-    board: Board, diagonal_indexes: List[Tuple[Tuple[int, int]]]
+    board: Board, diagonal_indexes: List[Tuple[Tuple[int, int], ...]]
 ) -> bool:
     for line in diagonal_indexes:
         sum_of_line = 0
@@ -72,12 +75,8 @@ def is_board_valid(board: Board) -> bool:
     return True
 
 
-def get_all_rows_summing_to_38(row_length: int = 3) -> List[Tuple[int]]:
-    rows = []
-    for tup in list(combinations(range(1, 20), row_length)):
-        if sum(tup) == 38:
-            rows.append(tup)
-    return rows
+def get_all_rows_summing_to_38(row_length: int = 3) -> List[Tuple[int, ...]]:
+    return [pieces for pieces in combinations(PIECES, row_length) if sum(pieces) == 38]
 
 
 def get_valid_board_combinations() -> Generator[Board, None, None]:
@@ -91,7 +90,7 @@ def get_valid_board_combinations() -> Generator[Board, None, None]:
     rows_of_5 = get_all_rows_summing_to_38(row_length=5)
 
     board_count = 0
-    using = set()
+    using: Set[int] = set()
     for x in combinations(rows_of_3, 2):
         using.update(x[0])
         if using.intersection(x[1]):
