@@ -75,7 +75,7 @@ fn get_valid_board_combinations() -> () {
                                     let board = build_board(
                                         &r1_perm, &r2_perm, &r3_perm, &r4_perm, &r5_perm,
                                     );
-                                    if is_board_valid(board) {
+                                    if is_board_valid(&board) {
                                         panic!("Found solution");
                                     }
 
@@ -163,8 +163,19 @@ fn generate_permuations<'a>(
     )
 }
 
-fn is_board_valid(board: Board) -> bool {
-    for line in DIAGONAL_LINE_DOWN_LEFT_INDEXES.iter() {
+fn is_board_valid(board: &Board) -> bool {
+    if !is_line_valid(board, DIAGONAL_LINE_DOWN_LEFT_INDEXES) {
+        return false;
+    }
+    if !is_line_valid(board, DIAGONAL_LINE_DOWN_RIGHT_INDEXES) {
+        return false;
+    }
+    println!("Found valid board: {:?}", board);
+    true
+}
+
+fn is_line_valid(board: &Board, diagonal_lines_indexes: &[&[&[usize]]]) -> bool {
+    for line in diagonal_lines_indexes.iter() {
         let mut sum_of_line = 0;
         for x_y in line.iter() {
             sum_of_line += board[x_y[0]][x_y[1]];
@@ -173,15 +184,5 @@ fn is_board_valid(board: Board) -> bool {
             return false;
         }
     }
-    for line in DIAGONAL_LINE_DOWN_RIGHT_INDEXES.iter() {
-        let mut sum_of_line = 0;
-        for x_y in line.iter() {
-            sum_of_line += board[x_y[0]][x_y[1]];
-        }
-        if sum_of_line != 38 {
-            return false;
-        }
-    }
-    println!("{:?}", board);
     true
 }
