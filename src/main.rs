@@ -1,6 +1,6 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, process};
 
-use itertools::{iproduct, Itertools, Tuples};
+use itertools::{iproduct, Itertools};
 
 const DIAGONAL_LINE_DOWN_LEFT_INDEXES: &[&[&[usize]]] = &[
     &[&[0, 0], &[1, 0], &[2, 0]],
@@ -19,7 +19,12 @@ const DIAGONAL_LINE_DOWN_RIGHT_INDEXES: &[&[&[usize]]] = &[
 ];
 
 type Row<'a> = &'a Vec<&'a u32>;
-type Board<'a> = Vec<Row<'a>>;
+// type Board<'a> = Vec<Row<'a>>;
+
+#[derive(Debug)]
+struct Board<'a> {
+    rows: Vec<Row<'a>>,
+}
 
 fn main() {
     get_valid_board_combinations();
@@ -76,7 +81,8 @@ fn get_valid_board_combinations() -> () {
                                         &r1_perm, &r2_perm, &r3_perm, &r4_perm, &r5_perm,
                                     );
                                     if is_board_valid(&board) {
-                                        panic!("Found solution");
+                                        println!("Found valid board: {:?}", board);
+                                        process::exit(1);
                                     }
 
                                     num_iterations += 1;
@@ -125,13 +131,9 @@ fn build_board<'a>(
     r4_perm: Row<'a>,
     r5_perm: Row<'a>,
 ) -> Board<'a> {
-    let mut board: Board = vec![];
-    board.push(r1_perm);
-    board.push(r2_perm);
-    board.push(r3_perm);
-    board.push(r4_perm);
-    board.push(r5_perm);
-    board
+    Board {
+        rows: vec![r1_perm, r2_perm, r3_perm, r4_perm, r5_perm],
+    }
 }
 
 /// for (r1, r2, r3, r4, r5) in generate_permuations(row_1, row_2, row_3, row_4, row_5) {
@@ -170,7 +172,6 @@ fn is_board_valid(board: &Board) -> bool {
     if !is_line_valid(board, DIAGONAL_LINE_DOWN_RIGHT_INDEXES) {
         return false;
     }
-    println!("Found valid board: {:?}", board);
     true
 }
 
@@ -178,7 +179,7 @@ fn is_line_valid(board: &Board, diagonal_lines_indexes: &[&[&[usize]]]) -> bool 
     for line in diagonal_lines_indexes.iter() {
         let mut sum_of_line = 0;
         for x_y in line.iter() {
-            sum_of_line += board[x_y[0]][x_y[1]];
+            sum_of_line += board.rows[x_y[0]][x_y[1]];
         }
         if sum_of_line != 38 {
             return false;
