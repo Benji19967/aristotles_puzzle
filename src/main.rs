@@ -42,29 +42,29 @@ fn get_valid_board_combinations() -> () {
     let mut board_combinations: Vec<Vec<&Vec<u32>>> = vec![];
     let mut num_iterations = 0;
 
-    for x in rows_of_3.iter().combinations(2) {
-        using.extend(x[0]);
-        if !using.is_disjoint(&hashset(&x[1])) {
-            for i in x[0].iter() {
+    for (row_1, row_5) in rows_of_3.iter().combinations(2).map(|v| (v[0], v[1])) {
+        using.extend(row_1);
+        if !using.is_disjoint(&hashset(row_5)) {
+            for i in row_1.iter() {
                 using.remove(i);
             }
             continue;
         }
-        using.extend(x[1]);
-        for y in rows_of_4.iter().combinations(2) {
-            if !using.is_disjoint(&hashset(&y[0])) {
+        using.extend(row_5);
+        for (row_2, row_4) in rows_of_4.iter().combinations(2).map(|v| (v[0], v[1])) {
+            if !using.is_disjoint(&hashset(&row_2)) {
                 continue;
             }
-            using.extend(y[0]);
-            if !using.is_disjoint(&hashset(&y[1])) {
-                for i in y[0].iter() {
+            using.extend(row_2);
+            if !using.is_disjoint(&hashset(&row_4)) {
+                for i in row_2.iter() {
                     using.remove(i);
                 }
                 continue;
             }
-            using.extend(y[1]);
-            for z in rows_of_5.iter() {
-                if !using.is_disjoint(&hashset(&z)) {
+            using.extend(row_4);
+            for row_3 in rows_of_5.iter() {
+                if !using.is_disjoint(&hashset(&row_3)) {
                     continue;
                 }
                 // println!("{:?}", x);
@@ -72,21 +72,22 @@ fn get_valid_board_combinations() -> () {
                 // println!("{:?}", z);
 
                 // println!("{:?}", using);
-                for row_1 in x[0].iter().permutations(x[0].len()) {
-                    for row_2 in y[0].iter().permutations(y[0].len()) {
-                        for row_3 in z.iter().permutations(z.len()) {
-                            for row_4 in y[1].iter().permutations(y[1].len()) {
-                                for row_5 in x[1].iter().permutations(x[1].len()) {
+                for row_1_perm in row_1.iter().permutations(row_1.len()) {
+                    for row_2_perm in row_2.iter().permutations(row_2.len()) {
+                        for row_3_perm in row_3.iter().permutations(row_3.len()) {
+                            for row_4_perm in row_4.iter().permutations(row_4.len()) {
+                                for row_5_perm in row_5.iter().permutations(row_5.len()) {
                                     let mut board: Vec<&Vec<&u32>> = vec![];
-                                    board.push(&row_1);
-                                    board.push(&row_2);
-                                    board.push(&row_3);
-                                    board.push(&row_4);
-                                    board.push(&row_5);
+                                    board.push(&row_1_perm);
+                                    board.push(&row_2_perm);
+                                    board.push(&row_3_perm);
+                                    board.push(&row_4_perm);
+                                    board.push(&row_5_perm);
                                     num_iterations += 1;
                                     // println!("{:?}", board);
                                     if num_iterations % 1000000 == 0 {
                                         println!("{}", num_iterations);
+                                        return;
                                     }
                                     if is_board_valid(board) {
                                         panic!("Found solution");
@@ -97,17 +98,17 @@ fn get_valid_board_combinations() -> () {
                     }
                 }
             }
-            for i in y[0].iter() {
+            for i in row_2.iter() {
                 using.remove(i);
             }
-            for i in y[1].iter() {
+            for i in row_4.iter() {
                 using.remove(i);
             }
         }
-        for i in x[0].iter() {
+        for i in row_1.iter() {
             using.remove(i);
         }
-        for i in x[1].iter() {
+        for i in row_5.iter() {
             using.remove(i);
         }
     }
