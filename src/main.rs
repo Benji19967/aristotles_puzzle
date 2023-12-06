@@ -2,6 +2,9 @@ use std::{collections::HashSet, process};
 
 use itertools::{iproduct, Itertools};
 
+/// Performance improvements:
+/// 1. Using `Board` struct: 190ms -> 145ms for 1'000'000 iterations
+
 const DIAGONAL_LINE_DOWN_LEFT_INDEXES: &[&[&[usize]]] = &[
     &[&[0, 0], &[1, 0], &[2, 0]],
     &[&[0, 1], &[1, 1], &[2, 1], &[3, 0]],
@@ -21,13 +24,50 @@ const DIAGONAL_LINE_DOWN_RIGHT_INDEXES: &[&[&[usize]]] = &[
 type Row<'a> = &'a Vec<&'a u32>;
 // type Board<'a> = Vec<Row<'a>>;
 
+fn main() {
+    get_valid_board_combinations();
+}
+
 #[derive(Debug)]
 struct Board<'a> {
     rows: Vec<Row<'a>>,
 }
 
-fn main() {
-    get_valid_board_combinations();
+impl<'a> Board<'a> {
+    fn is_valid(&self) -> bool {
+        if !self.is_line_valid(DIAGONAL_LINE_DOWN_LEFT_INDEXES) {
+            return false;
+        }
+        if !self.is_line_valid(DIAGONAL_LINE_DOWN_RIGHT_INDEXES) {
+            return false;
+        }
+        true
+    }
+
+    fn is_line_valid(&self, diagonal_lines_indexes: &[&[&[usize]]]) -> bool {
+        for line in diagonal_lines_indexes.iter() {
+            let mut sum_of_line = 0;
+            for x_y in line.iter() {
+                sum_of_line += self.rows[x_y[0]][x_y[1]];
+            }
+            if sum_of_line != 38 {
+                return false;
+            }
+        }
+        true
+    }
+
+    fn new(
+        r1_perm: Row<'a>,
+        r2_perm: Row<'a>,
+        r3_perm: Row<'a>,
+        r4_perm: Row<'a>,
+        r5_perm: Row<'a>,
+    ) -> Self {
+        Self {
+            rows: vec![r1_perm, r2_perm, r3_perm, r4_perm, r5_perm],
+        }
+    }
 }
 
 fn hashset(data: &[u32]) -> HashSet<u32> {
@@ -42,33 +82,32 @@ fn get_valid_board_combinations() -> () {
     // println!("{:?}", rows_of_4.len());
     // println!("{:?}", rows_of_5.len());
 
-    let mut using: HashSet<u32> = HashSet::new();
-    let mut board_combinations: Vec<Vec<&Vec<u32>>> = vec![];
+    let mut used_numbers: HashSet<u32> = HashSet::new();
     let mut num_iterations = 0;
 
     for (row_1, row_5) in rows_of_3.iter().combinations(2).map(|v| (v[0], v[1])) {
-        using.extend(row_1);
-        if !using.is_disjoint(&hashset(row_5)) {
+        used_numbers.extend(row_1);
+        if !used_numbers.is_disjoint(&hashset(row_5)) {
             for i in row_1.iter() {
-                using.remove(i);
+                used_numbers.remove(i);
             }
             continue;
         }
-        using.extend(row_5);
+        used_numbers.extend(row_5);
         for (row_2, row_4) in rows_of_4.iter().combinations(2).map(|v| (v[0], v[1])) {
-            if !using.is_disjoint(&hashset(&row_2)) {
+            if !used_numbers.is_disjoint(&hashset(&row_2)) {
                 continue;
             }
-            using.extend(row_2);
-            if !using.is_disjoint(&hashset(&row_4)) {
+            used_numbers.extend(row_2);
+            if !used_numbers.is_disjoint(&hashset(&row_4)) {
                 for i in row_2.iter() {
-                    using.remove(i);
+                    used_numbers.remove(i);
                 }
                 continue;
             }
-            using.extend(row_4);
+            used_numbers.extend(row_4);
             for row_3 in rows_of_5.iter() {
-                if !using.is_disjoint(&hashset(&row_3)) {
+                if !used_numbers.is_disjoint(&hashset(&row_3)) {
                     continue;
                 }
 
@@ -77,10 +116,10 @@ fn get_valid_board_combinations() -> () {
                         for r3_perm in row_3.iter().permutations(row_3.len()) {
                             for r4_perm in row_4.iter().permutations(row_4.len()) {
                                 for r5_perm in row_5.iter().permutations(row_5.len()) {
-                                    let board = build_board(
+                                    let board = Board::new(
                                         &r1_perm, &r2_perm, &r3_perm, &r4_perm, &r5_perm,
                                     );
-                                    if is_board_valid(&board) {
+                                    if board.is_valid() {
                                         println!("Found valid board: {:?}", board);
                                         process::exit(1);
                                     }
@@ -98,17 +137,17 @@ fn get_valid_board_combinations() -> () {
                 }
             }
             for i in row_2.iter() {
-                using.remove(i);
+                used_numbers.remove(i);
             }
             for i in row_4.iter() {
-                using.remove(i);
+                used_numbers.remove(i);
             }
         }
         for i in row_1.iter() {
-            using.remove(i);
+            used_numbers.remove(i);
         }
         for i in row_5.iter() {
-            using.remove(i);
+            used_numbers.remove(i);
         }
     }
 }
@@ -122,18 +161,6 @@ fn get_all_rows_summing_to_38(row_length: usize) -> Vec<Vec<u32>> {
         }
     }
     rows
-}
-
-fn build_board<'a>(
-    r1_perm: Row<'a>,
-    r2_perm: Row<'a>,
-    r3_perm: Row<'a>,
-    r4_perm: Row<'a>,
-    r5_perm: Row<'a>,
-) -> Board<'a> {
-    Board {
-        rows: vec![r1_perm, r2_perm, r3_perm, r4_perm, r5_perm],
-    }
 }
 
 /// for (r1, r2, r3, r4, r5) in generate_permuations(row_1, row_2, row_3, row_4, row_5) {
@@ -163,27 +190,4 @@ fn generate_permuations<'a>(
         row_4.iter().permutations(row_4.len()),
         row_5.iter().permutations(row_5.len())
     )
-}
-
-fn is_board_valid(board: &Board) -> bool {
-    if !is_line_valid(board, DIAGONAL_LINE_DOWN_LEFT_INDEXES) {
-        return false;
-    }
-    if !is_line_valid(board, DIAGONAL_LINE_DOWN_RIGHT_INDEXES) {
-        return false;
-    }
-    true
-}
-
-fn is_line_valid(board: &Board, diagonal_lines_indexes: &[&[&[usize]]]) -> bool {
-    for line in diagonal_lines_indexes.iter() {
-        let mut sum_of_line = 0;
-        for x_y in line.iter() {
-            sum_of_line += board.rows[x_y[0]][x_y[1]];
-        }
-        if sum_of_line != 38 {
-            return false;
-        }
-    }
-    true
 }
