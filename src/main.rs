@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use itertools::{Itertools, Tuples};
+use itertools::{iproduct, Itertools, Tuples};
 
 const DIAGONAL_LINE_DOWN_LEFT_INDEXES: &[&[&[usize]]] = &[
     &[&[0, 0], &[1, 0], &[2, 0]],
@@ -18,13 +18,12 @@ const DIAGONAL_LINE_DOWN_RIGHT_INDEXES: &[&[&[usize]]] = &[
     &[&[0, 2], &[1, 3], &[2, 4]],
 ];
 
+type Row<'a> = &'a Vec<&'a u32>;
+type Board<'a> = Vec<Row<'a>>;
+
 fn main() {
-    // let rows_5 = get_all_rows_summing_to_38(5);
-    // println!("{:?}", rows_5);
     get_valid_board_combinations();
 }
-
-type Board = Vec<Vec<u32>>;
 
 fn hashset(data: &[u32]) -> HashSet<u32> {
     HashSet::from_iter(data.iter().cloned())
@@ -67,30 +66,24 @@ fn get_valid_board_combinations() -> () {
                 if !using.is_disjoint(&hashset(&row_3)) {
                     continue;
                 }
-                // println!("{:?}", x);
-                // println!("{:?}", y);
-                // println!("{:?}", z);
 
-                // println!("{:?}", using);
-                for row_1_perm in row_1.iter().permutations(row_1.len()) {
-                    for row_2_perm in row_2.iter().permutations(row_2.len()) {
-                        for row_3_perm in row_3.iter().permutations(row_3.len()) {
-                            for row_4_perm in row_4.iter().permutations(row_4.len()) {
-                                for row_5_perm in row_5.iter().permutations(row_5.len()) {
-                                    let mut board: Vec<&Vec<&u32>> = vec![];
-                                    board.push(&row_1_perm);
-                                    board.push(&row_2_perm);
-                                    board.push(&row_3_perm);
-                                    board.push(&row_4_perm);
-                                    board.push(&row_5_perm);
+                for r1_perm in row_1.iter().permutations(row_1.len()) {
+                    for r2_perm in row_2.iter().permutations(row_2.len()) {
+                        for r3_perm in row_3.iter().permutations(row_3.len()) {
+                            for r4_perm in row_4.iter().permutations(row_4.len()) {
+                                for r5_perm in row_5.iter().permutations(row_5.len()) {
+                                    let board = build_board(
+                                        &r1_perm, &r2_perm, &r3_perm, &r4_perm, &r5_perm,
+                                    );
+                                    if is_board_valid(board) {
+                                        panic!("Found solution");
+                                    }
+
                                     num_iterations += 1;
                                     // println!("{:?}", board);
                                     if num_iterations % 1000000 == 0 {
                                         println!("{}", num_iterations);
                                         return;
-                                    }
-                                    if is_board_valid(board) {
-                                        panic!("Found solution");
                                     }
                                 }
                             }
@@ -125,7 +118,52 @@ fn get_all_rows_summing_to_38(row_length: usize) -> Vec<Vec<u32>> {
     rows
 }
 
-fn is_board_valid(board: Vec<&Vec<&u32>>) -> bool {
+fn build_board<'a>(
+    r1_perm: Row<'a>,
+    r2_perm: Row<'a>,
+    r3_perm: Row<'a>,
+    r4_perm: Row<'a>,
+    r5_perm: Row<'a>,
+) -> Board<'a> {
+    let mut board: Board = vec![];
+    board.push(r1_perm);
+    board.push(r2_perm);
+    board.push(r3_perm);
+    board.push(r4_perm);
+    board.push(r5_perm);
+    board
+}
+
+/// for (r1, r2, r3, r4, r5) in generate_permuations(row_1, row_2, row_3, row_4, row_5) {
+///     ...
+/// }
+///
+/// Using this makes the program ~3x slower ...
+fn generate_permuations<'a>(
+    row_1: &'a Vec<u32>,
+    row_2: &'a Vec<u32>,
+    row_3: &'a Vec<u32>,
+    row_4: &'a Vec<u32>,
+    row_5: &'a Vec<u32>,
+) -> impl Iterator<
+    Item = (
+        Vec<&'a u32>,
+        Vec<&'a u32>,
+        Vec<&'a u32>,
+        Vec<&'a u32>,
+        Vec<&'a u32>,
+    ),
+> {
+    iproduct!(
+        row_1.iter().permutations(row_1.len()),
+        row_2.iter().permutations(row_2.len()),
+        row_3.iter().permutations(row_3.len()),
+        row_4.iter().permutations(row_4.len()),
+        row_5.iter().permutations(row_5.len())
+    )
+}
+
+fn is_board_valid(board: Board) -> bool {
     for line in DIAGONAL_LINE_DOWN_LEFT_INDEXES.iter() {
         let mut sum_of_line = 0;
         for x_y in line.iter() {
