@@ -2,6 +2,8 @@ import sys
 
 N = 19
 
+INDEXES_ORDER = [0, 1, 2, 6, 11, 15, 18, 17, 16, 12, 7, 3, 4, 5, 10, 14, 13, 8, 9]
+
 
 def is_valid(b):
     return (
@@ -50,28 +52,28 @@ def solve():
     board = [0] * N
     used = [0] * (N + 1)  # acts as a hash table
 
-    def place(i):
+    def place(i, find_all=False):
         if i == N:
             print(board)
-            return True
+            return not find_all
 
+        board_idx = INDEXES_ORDER[i]
         for j in range(1, N + 1):
             if used[j]:
                 continue
 
-            board[i] = j
+            board[board_idx] = j
             used[j] = 1
 
-            if is_valid(board) and place(i + 1):
+            if is_valid(board) and place(i=i + 1, find_all=find_all):
                 sys.exit()
-                return
 
-            board[i] = 0
+            board[board_idx] = 0
             used[j] = 0
 
         return False
 
-    place(0)
+    place(0, find_all=True)
 
 
 if __name__ == "__main__":
