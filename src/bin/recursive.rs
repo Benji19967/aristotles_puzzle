@@ -3,6 +3,12 @@ use std::process;
 const REQUIRED_SUM: usize = 38;
 const N: usize = 19;
 
+// Changing the order or traversal brings the time down from ~22s to ~0.2s, roughly a 100x
+// improvement
+const INDEXES_ORDER: &[usize] = &[
+    0, 1, 2, 6, 11, 15, 18, 17, 16, 12, 7, 3, 4, 5, 10, 14, 13, 8, 9,
+];
+
 fn main() {
     let mut board: Vec<u32> = vec![0; N];
     let mut used: Vec<u32> = vec![0; N + 1];
@@ -15,18 +21,19 @@ fn place(board: &mut Vec<u32>, used: &mut Vec<u32>, i: usize, find_all_solutions
         return true && !find_all_solutions;
     }
 
+    let board_idx = INDEXES_ORDER[i];
     for j in 1..=19 {
         if used[j] != 0 {
             continue;
         }
 
-        board[i] = j as u32;
+        board[board_idx] = j as u32;
         used[j as usize] = 1;
         if is_valid(board, LINES) && place(board, used, i + 1, find_all_solutions) {
             process::exit(0);
         }
 
-        board[i] = 0;
+        board[board_idx] = 0;
         used[j as usize] = 0;
     }
     false
