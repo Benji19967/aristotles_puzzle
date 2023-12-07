@@ -11,7 +11,7 @@ fn main() {
 
 fn place(board: &mut Vec<u32>, used: &mut Vec<u32>, i: usize, find_all_solutions: bool) -> bool {
     if i == N {
-        println!("{:?}", board);
+        print_board(board);
         return true && !find_all_solutions;
     }
 
@@ -59,4 +59,23 @@ fn is_valid(b: &Vec<u32>, lines: &[&[usize]]) -> bool {
         }
     }
     true
+}
+
+/// Resources for formatting when printing:
+///
+/// https://stackoverflow.com/questions/35280798/printing-a-character-a-variable-number-of-times-with-println
+/// https://stackoverflow.com/questions/61032075/how-can-i-join-a-vec-of-i32-numbers-into-a-string
+///
+fn print_board(board: &Vec<u32>) {
+    let mut starting_idx: usize = 0;
+    for row_len in vec![3, 4, 5, 4, 3] {
+        let row = &board[starting_idx..starting_idx + row_len];
+        let joined: String = row
+            .iter()
+            .map(|&id| format!("{:0>2}", id.to_string()) + " ")
+            .collect();
+        println!("{: ^15}", joined);
+        starting_idx += row_len;
+    }
+    println!("");
 }
