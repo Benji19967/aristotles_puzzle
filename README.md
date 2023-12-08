@@ -68,17 +68,16 @@ computing the other ones from it.
 
 ### Recursive approach
 
+Language | Time Basic | Time Optimal | Memory
+---------|------------|--------------|-------
+Python   | ~11m 15s   |      ~5.5s   |   ~6MB
+Rust     |     ~22s   |     ~201ms   | ~980KB
+
+
+#### Basic (No optimizations)
+
 - Use pruning to discard whole sets of solutions that are not valid
-- Memory usage using Python: ~6MB
-- Memory usage using Rust: ~980KB
 
-#### Basic -- no optimizations
-
-- Time using Python: ~11min 15sec
-- Time using Rust: ~22s
-
-#### Optimal traversal
+#### Optimal
 
 - Try slots in an order such that more solutions get pruned
-- Time using Python: ~5.5s
-- Time using Rust: ~201ms
