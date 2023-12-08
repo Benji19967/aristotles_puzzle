@@ -55,13 +55,12 @@ b[3] + b[4] + b[5] + b[6] = 38
 
 ### Recursive approach
 
-#### Bacis -- no optimizations
+#### Basic -- no optimizations
 
 - Use pruning to discard whole sets of solutions that are not valid
 - Time: # TODO
 
 #### Optimal traversal
 
-- Use pruning to discard whole sets of solutions that are not valid
 - Try slots in an order such that more solutions get pruned
-- Time: # TODO
+- Time: ~200ms
