@@ -43,3 +43,25 @@ b[0] + b[1] + b[2] = 38
 b[3] + b[4] + b[5] + b[6] = 38
 ...
 ```
+
+## Solutions
+
+### Brute force
+
+- Try all possible combinations and check whether the board is valid
+- Time complexity: `O(n!)`
+- `19! ~= 1.2^17` 
+- Estimated time on my laptop (MacBook Pro M1) using Rust: # TODO
+
+### Recursive approach
+
+#### Bacis -- no optimizations
+
+- Use pruning to discard whole sets of solutions that are not valid
+- Time: # TODO
+
+#### Optimal traversal
+
+- Use pruning to discard whole sets of solutions that are not valid
+- Try slots in an order such that more solutions get pruned
+- Time: # TODO
