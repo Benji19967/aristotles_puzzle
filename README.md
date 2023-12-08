@@ -46,6 +46,12 @@ b[3] + b[4] + b[5] + b[6] = 38
 
 ## Solutions
 
+There are 12 solutions, although there is only really 1 unique solutions. The others
+are just mirrors or reflections. 
+
+We will let the programs find all 12 solutions, rather than finding 1 and then 
+computing the other ones from it. 
+
 ### Brute force
 
 - Try all possible combinations and check whether the board is valid
@@ -58,9 +64,11 @@ b[3] + b[4] + b[5] + b[6] = 38
 #### Basic -- no optimizations
 
 - Use pruning to discard whole sets of solutions that are not valid
-- Time: # TODO
+- Time using Python: # TODO
+- Time using Rust: ~22s
 
 #### Optimal traversal
 
 - Try slots in an order such that more solutions get pruned
-- Time: ~200ms
+- Time using Python: ~5.5s
+- Time using Rust: ~200ms
