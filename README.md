@@ -64,11 +64,13 @@ computing the other ones from it.
 #### Basic -- no optimizations
 
 - Use pruning to discard whole sets of solutions that are not valid
-- Time using Python: # TODO
+- Time using Python: ~11min 15sec
 - Time using Rust: ~22s
+- Memory usage using Python: ~6MB
+- Memory usage using Rust: ~980KB
 
 #### Optimal traversal
 
 - Try slots in an order such that more solutions get pruned
 - Time using Python: ~5.5s
-- Time using Rust: ~200ms
+- Time using Rust: ~201ms
