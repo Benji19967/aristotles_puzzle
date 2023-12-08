@@ -56,18 +56,26 @@ computing the other ones from it.
 
 - Try all possible combinations and check whether the board is valid
 - Time complexity: `O(n!)`
-- `19! ~= 1.2^17` 
+- Number of possible permutations: `19! ~= 1.2^17` 
 - Estimated time on my laptop (MacBook Pro M1) using Rust: # TODO
+- Estimated amount of storage it would take to store all permutations: 
+  - `~1.2^17 permutations * 47 bytes` = `~5.7^18 bytes` = `~5700 Petabytes` = `~5.7 Exabytes`
+      - If we store one permutation per line, as a sequence of comma separated numbers, in a `.txt` file,
+      each permutation will use `~47 bytes`:
+        - `9 bytes` to store digits `0..=9`
+        - `20 bytes` to store digits `10..=19`
+        - `18 bytes` for commas
 
 ### Recursive approach
 
-#### Basic -- no optimizations
-
 - Use pruning to discard whole sets of solutions that are not valid
-- Time using Python: ~11min 15sec
-- Time using Rust: ~22s
 - Memory usage using Python: ~6MB
 - Memory usage using Rust: ~980KB
+
+#### Basic -- no optimizations
+
+- Time using Python: ~11min 15sec
+- Time using Rust: ~22s
 
 #### Optimal traversal
 
