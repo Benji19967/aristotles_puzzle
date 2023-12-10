@@ -85,8 +85,20 @@ def generate_valid_board_combinations() -> Generator[Board, None, None]:
     rows_of_3 = get_all_rows_summing_to_required_sum(row_length=3)
     rows_of_4 = get_all_rows_summing_to_required_sum(row_length=4)
     rows_of_5 = get_all_rows_summing_to_required_sum(row_length=5)
-    for comb in list(combinations(rows_of_3, 2)):
-        print(comb)
+
+    count = 0
+    for rows in list(
+        combinations((p for row in rows_of_3 for p in permutations(row)), 3)
+    ):
+        all = set(rows[0])
+        is_valid = True
+        for r in rows[1:]:
+            if not len(all.intersection(r)) == 1 or not rows[0][2] == rows[1][0]:
+                is_valid = False
+            all.update(r)
+        if is_valid:
+            count += 1
+    print(count)
 
     board_count = 0
     using: Set[int] = set()

@@ -104,8 +104,28 @@ and don't need to bec checked. In this case, this means we don't have to fill up
 #### Optimal
 
 - Try slots in an order such that more solutions get pruned
-  - Key observation: lines of length 3 will fail quicker than lines of length 4 which will fail quicker than 
-  lines of length 5.
+  <!-- - Key observation: lines of length 3 will fail quicker than lines of length 4 which will fail quicker than  -->
+  <!-- lines of length 5. -->
+
+TODO: Explain how you calulcate number of valid board configurations.
+
+Filling the board:
+- First row (indexes 01, 02, 03):
+  - 0 pieces have already been set, 19 are left
+  - 34'884: configurations of new pieces (19 * 18 * 17) * 3!
+  - 34'884: total configurations checked. 0 (previous valid) * 34'884 (new).
+  - 180: valid board configurations 30 * 3!
+- indexes 04, 05
+  - 3 pieces have already been set, 16 are left
+  - 480: configurations of new pieces (16 * 15) * 2!
+  - 86'400: total configurations checked. 180 (previous valid) * 480 (new).
+  - 880: valid board configurations
+- indexes 06, 07
+  - 5 pieces have already been set, 14 are left
+  - 364: configurations of new pieces (14 * 13) * 2!
+  - 320'320: total configurations checked. 880 (previous valid) * 364 (new).
+  - 33'600 valid board combinations
+
 - Order of traversal:
 ```
     01  02  03
