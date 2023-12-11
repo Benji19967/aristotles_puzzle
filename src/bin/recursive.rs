@@ -12,10 +12,20 @@ const INDEXES_ORDER: &[usize] = &[
 fn main() {
     let mut board: Vec<u32> = vec![0; N];
     let mut used: Vec<u32> = vec![0; N + 1];
-    place(&mut board, &mut used, 0, true);
+    let mut checked: Vec<u32> = vec![0; N + 1];
+    place(&mut board, &mut used, &mut checked, 0, true);
+
+    println!("{:?}", checked);
+    println!("{:?}", checked.iter().sum::<u32>());
 }
 
-fn place(board: &mut Vec<u32>, used: &mut Vec<u32>, i: usize, find_all_solutions: bool) -> bool {
+fn place(
+    board: &mut Vec<u32>,
+    used: &mut Vec<u32>,
+    checked: &mut Vec<u32>,
+    i: usize,
+    find_all_solutions: bool,
+) -> bool {
     if i == N {
         print_board(board);
         return true && !find_all_solutions;
@@ -29,12 +39,13 @@ fn place(board: &mut Vec<u32>, used: &mut Vec<u32>, i: usize, find_all_solutions
 
         board[board_idx] = j as u32;
         used[j as usize] = 1;
-        if is_valid(board, LINES) && place(board, used, i + 1, find_all_solutions) {
+        if is_valid(board, LINES) && place(board, used, checked, i + 1, find_all_solutions) {
             process::exit(0);
         }
 
         board[board_idx] = 0;
         used[j as usize] = 0;
+        checked[i] += 1;
     }
     false
 }

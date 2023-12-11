@@ -88,16 +88,17 @@ def generate_valid_board_combinations() -> Generator[Board, None, None]:
 
     count = 0
     for rows in list(
-        combinations((p for row in rows_of_3 for p in permutations(row)), 3)
+        combinations((p for row in rows_of_3 for p in permutations(row)), 2)
     ):
-        all = set(rows[0])
-        is_valid = True
-        for r in rows[1:]:
-            if not len(all.intersection(r)) == 1 or not rows[0][2] == rows[1][0]:
-                is_valid = False
-            all.update(r)
-        if is_valid:
-            count += 1
+        for rows in permutations(rows):
+            all = set(rows[0])
+            is_valid = True
+            for r in rows[1:]:
+                if not len(all.intersection(r)) == 1 or not rows[0][2] == rows[1][0]:
+                    is_valid = False
+                all.update(r)
+            if is_valid:
+                count += 1
     print(count)
 
     board_count = 0
